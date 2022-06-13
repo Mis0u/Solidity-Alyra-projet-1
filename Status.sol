@@ -8,32 +8,32 @@ contract Status is Ownable {
 
     WorkflowStatus public status;
 
-    event VoterRegistered(address voterAddress);
+    event VoterRegistered(address voterAddress); 
     event WorkflowStatusChange(WorkflowStatus previousStatus, WorkflowStatus newStatus);
     event ProposalRegistered(uint proposalId);
     event Voted (address voter, uint proposalId);
 
-    function proposalsRegistrationStarted() public onlyOwner{
+    function proposalsRegistrationStarted() external onlyOwner{
         status = WorkflowStatus.ProposalsRegistrationStarted;
         emit WorkflowStatusChange(WorkflowStatus.RegisteringVoters, WorkflowStatus.ProposalsRegistrationStarted);
     }
 
-    function proposalsRegistrationEnded() public onlyOwner{
+    function proposalsRegistrationEnded() external onlyOwner{
         status = WorkflowStatus.ProposalsRegistrationEnded;
         emit WorkflowStatusChange(WorkflowStatus.ProposalsRegistrationStarted, WorkflowStatus.ProposalsRegistrationEnded);
     }
 
-    function votingSessionStarted() public onlyOwner{
+    function votingSessionStarted() external onlyOwner{
         status = WorkflowStatus.VotingSessionStarted;
         emit WorkflowStatusChange(WorkflowStatus.ProposalsRegistrationEnded, WorkflowStatus.VotingSessionStarted);
     }
 
-    function votingSessionEnded() public onlyOwner{
+    function votingSessionEnded() external onlyOwner{
         status = WorkflowStatus.VotingSessionEnded;
         emit WorkflowStatusChange(WorkflowStatus.VotingSessionStarted, WorkflowStatus.VotingSessionEnded);
     }
 
-    function voteTallied() public onlyOwner{
+    function voteTallied() external onlyOwner{
         status = WorkflowStatus.VotesTallied;
         emit WorkflowStatusChange(WorkflowStatus.VotingSessionEnded, WorkflowStatus.VotesTallied);
     }

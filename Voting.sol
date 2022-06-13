@@ -8,8 +8,6 @@ contract Voting is Status {
 
     mapping(address => Voter) public voters;
 
-    mapping(uint => string) proposalList;
-
     mapping(address => uint) showingVotes;
 
     string[] proposalListArray;
@@ -19,7 +17,7 @@ contract Voting is Status {
         bool hasVoted;
         uint votedProposalId;
     }
-
+    
     struct Proposal {
         string description;
         uint voteCount;
@@ -35,15 +33,13 @@ contract Voting is Status {
         voters[_user].isRegistered = true;
     }
 
-    function proposalsRegistration(string memory _description) public {
+    function proposalsRegistration(string memory _description) external {
         require(status == WorkflowStatus.ProposalsRegistrationStarted, unicode'Désolé, nous n\'acceptons plus de proposition');
         require(voters[msg.sender].isRegistered == true, unicode'Vous n\'êtes pas autorisé à faire des propositions');
 
         proposals.push(Proposal({description: _description, voteCount: 0}));
 
         uint proposalId = proposals.length - 1;
-
-        proposalList[proposalId] = _description;
 
         string memory concat = concatenateStrings(Strings.toString(proposalId), ' => ', _description);
         proposalListArray.push(concat);
@@ -54,7 +50,7 @@ contract Voting is Status {
         return proposalListArray;
     }
 
-    function voteRegistration(uint8 _id) public {
+    function voteRegistration(uint8 _id) external {
         require(status == WorkflowStatus.VotingSessionStarted, unicode'Désolé, nous n\'acceptons plus de vote !');
         require(voters[msg.sender].isRegistered == true, unicode'Vous n\'êtes pas autorisé à voter');
         require(_id < proposalListArray.length, unicode'Désolé cette proposition n\'existe pas');
@@ -64,21 +60,21 @@ contract Voting is Status {
         voters[msg.sender].votedProposalId = _id;
 
         proposals[_id].voteCount++;
-
+        
         showingVotes[msg.sender] = _id;
 
         emit VoterRegistered(msg.sender);
         emit Voted(msg.sender, _id);
     }
 
-    function voteTalliedCount() public  {
+    function voteTalliedCount() external  {
         require(status == WorkflowStatus.VotingSessionEnded, unicode'Nous ne sommes pas encorer à cette étape');
 
         uint currentWinningProposalId;
         uint nbVotes;
 
         for (uint8 i = 0; i < proposals.length; i++) {
-            if (proposals[i].voteCount > nbVotes) {
+            if (proposals[i].voteCount >= nbVotes) {
                 currentWinningProposalId = i;
                 nbVotes = proposals[i].voteCount;
             }
@@ -91,8 +87,8 @@ contract Voting is Status {
         require(status == WorkflowStatus.VotesTallied, 'Nous ne connaissons pas encore la proposition gagnante');
 
         return (
-        proposals[winningProposalId].description,
-        proposals[winningProposalId].voteCount
+            proposals[winningProposalId].description,
+            proposals[winningProposalId].voteCount
         );
 
     }
@@ -108,3 +104,5 @@ contract Voting is Status {
         return string.concat(s1,s2,s3);
     }
 }
+
+    
